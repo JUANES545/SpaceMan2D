@@ -47,7 +47,7 @@ public class PlayerController : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    void Start(){
+    private void Start(){
         
         animator.SetBool(STATE_MOVEMENT, false);
 
@@ -71,13 +71,13 @@ public class PlayerController : MonoBehaviour
         mainCamara.GetComponent<CamaraFollow>().ResetCamaraPosition();*/
     }
 
-    void Update(){
+    private void Update(){
         animator.enabled = true;
         animator.SetBool(STATE_ON_THE_GROUND, IsTouchingTheGround());
         animator.SetBool(STATE_MOVEMENT, IsMoving());
     }
 
-    void FixedUpdate(){
+    private void FixedUpdate(){
         /*if (playerRigidbody.velocity.x < runningSpeed){
             playerRigidbody.velocity = new Vector2(runningSpeed, playerRigidbody.velocity.y);
         }*/
@@ -129,8 +129,8 @@ public class PlayerController : MonoBehaviour
             Run(false);
         }
     }
-    
-    public void Run(bool superRun){
+
+    private void Run(bool superRun){
         if (superRun && manaPoints >= SUPERRUN_COST) {
             manaPoints -= SUPERRUN_COST;
             runFactor *= SUPERRUN_FORCE;
@@ -148,7 +148,8 @@ public class PlayerController : MonoBehaviour
             Fall();
         }
     }
-    void Jump(bool superJump) {
+
+    private void Jump(bool superJump) {
         float jumpForceFactor = jumpForce;
         if (superJump && manaPoints>= SUPERJUMP_COST) {
             manaPoints -= SUPERJUMP_COST;
@@ -167,7 +168,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    bool IsTouchingTheGround() {
+    private bool IsTouchingTheGround() {
         if (Physics2D.Raycast(this.transform.position, Vector2.down, 1.5f, groundMask)){
             //TODO: 
             //animator.enabled = true;
@@ -179,7 +180,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    bool IsMoving() {
+    private bool IsMoving() {
         return playerRigidbody.velocity.x != 0;
     }
 
