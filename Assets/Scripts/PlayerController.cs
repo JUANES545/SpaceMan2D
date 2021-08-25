@@ -19,7 +19,7 @@ public class PlayerController : MonoBehaviour
 
     private const string STATE_ALIVE = "isAlive";
     private const string STATE_ON_THE_GROUND = "isOnTheGround";
-    private string STATE_MOVEMENT = "isMoving";
+    private const string STATE_MOVEMENT = "isMoving";
 
     private int healthPoints, manaPoints;
 
@@ -28,17 +28,19 @@ public class PlayerController : MonoBehaviour
     private float inputX;
     private float inputY;
 
-    public const int INITIAL_HEALTH = 100,
-        INITIAL_MANA = 15,
-        MAX_HEALTH = 200,
+    private const int INITIAL_HEALTH = 100;
+
+    private const int INITIAL_MANA = 15;
+
+    public const int MAX_HEALTH = 200,
         MAX_MANA = 30,
         MIN_HEALTH = 10,
         MIN_MANA = 0;
 
-    public const int SUPERJUMP_COST = 5;
-    public const float SUPERJUMP_FORCE = 1.5f;
-    public const int SUPERRUN_COST = 5;
-    public const float SUPERRUN_FORCE = 1.5f;
+    private const int SUPERJUMP_COST = 5;
+    private const float SUPERJUMP_FORCE = 1.5f;
+    private const int SUPERRUN_COST = 5;
+    private const float SUPERRUN_FORCE = 1.5f;
     float runFactor = 5f;
 
     private void Awake(){
@@ -98,10 +100,11 @@ public class PlayerController : MonoBehaviour
             if (context.performed) {
                 Fall();
             }
-        if (inputY > 0)
-            if (context.performed) {
-                Jump(false);
-            }
+
+        if (!(inputY > 0)) return;
+        if (context.performed) {
+            Jump(false);
+        }
     }
 
     public void Move(InputAction.CallbackContext context){
@@ -130,17 +133,18 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void Run(bool superRun){
-        if (superRun && manaPoints >= SUPERRUN_COST) {
-            manaPoints -= SUPERRUN_COST;
-            runFactor *= SUPERRUN_FORCE;
-        }
-
-        if (!superRun)
+    private void Run(bool superRun)
+    {
+        switch (superRun)
         {
-            runFactor = runningSpeed;
+            case true when manaPoints >= SUPERRUN_COST:
+                manaPoints -= SUPERRUN_COST;
+                runFactor *= SUPERRUN_FORCE;
+                break;
+            case false:
+                runFactor = runningSpeed;
+                break;
         }
-
     }
     
     public void Down(InputAction.CallbackContext context){
@@ -150,34 +154,26 @@ public class PlayerController : MonoBehaviour
     }
 
     private void Jump(bool superJump) {
-        float jumpForceFactor = jumpForce;
+        var jumpForceFactor = jumpForce;
         if (superJump && manaPoints>= SUPERJUMP_COST) {
             manaPoints -= SUPERJUMP_COST;
             jumpForceFactor *= SUPERJUMP_FORCE;
         }
 
-        if (IsTouchingTheGround()){
-            GetComponent<AudioSource>().Play();
-            playerRigidbody.AddForce(Vector2.up * jumpForceFactor, ForceMode2D.Impulse);
-        }
+        if (!IsTouchingTheGround()) return;
+        GetComponent<AudioSource>().Play();
+        playerRigidbody.AddForce(Vector2.up * jumpForceFactor, ForceMode2D.Impulse);
     }
-    
-    void Fall(){
+
+    private void Fall(){
         if (!IsTouchingTheGround()) {
             playerRigidbody.AddForce(Vector2.down * (jumpForce*2), ForceMode2D.Impulse);
         }
     }
 
-    private bool IsTouchingTheGround() {
-        if (Physics2D.Raycast(this.transform.position, Vector2.down, 1.5f, groundMask)){
-            //TODO: 
-            //animator.enabled = true;
-            return true;
-        }else{
-            //TODO:
-            //animator.enabled = false;
-            return false;
-        }
+    private bool IsTouchingTheGround()
+    {
+        return Physics2D.Raycast(this.transform.position, Vector2.down, 1.5f, groundMask);
     }
 
     private bool IsMoving() {
@@ -185,8 +181,8 @@ public class PlayerController : MonoBehaviour
     }
 
     public void Die() {
-        float travelledDistance = GetTravelledDistance();
-        float previousMaxDistance = PlayerPrefs.GetFloat("MaxScore", 0f);
+        var travelledDistance = GetTravelledDistance();
+        var previousMaxDistance = PlayerPrefs.GetFloat("MaxScore", 0f);
         if (travelledDistance > previousMaxDistance)
         {
             PlayerPrefs.SetFloat("MaxScore", travelledDistance);
